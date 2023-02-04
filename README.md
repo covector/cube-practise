@@ -1,5 +1,6 @@
-<img src="docs-img/cube_1.webp" width="45%"></img> <img src="docs-img/cube_2.webp" width="45%"></img>
 # Cube Practise
+<img src="docs-img/cube_1.webp" width="45%"></img> <img src="docs-img/cube_2.webp" width="45%"></img>
+
 This is a tool for generating cubes, cuboids, cylinders or elliptic cylinders in different angles and FOV.
 
 ## Usage
