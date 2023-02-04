@@ -29,11 +29,11 @@ texLoader.load("./redwax.jpg", updateTexture);
 // cube, cuboid, cylinder, elliptic-cylinder
 let objType = document.URL.match(/(?<=[\?\&]type=)[a-z\-]+/);
 if (!objType) {
-  objType = "cuboid";
+  objType = "cube";
 }
 if (objType != "cube" && objType != "cuboid" && objType != "cylinder" && objType != "elliptic-cylinder") {
   alert("Invalid object type! Supported types: (cube, cuboid, cylinder, elliptic-cylinder)");
-  objType = "cuboid";
+  objType = "cube";
 }
 let geometry = objType == "cube" || objType == "cuboid" ? new THREE.BoxGeometry(1, 1, 1) : new THREE.CylinderGeometry(0.5, 0.5, 1, 64, 1);
 const material = new THREE.MeshMatcapMaterial();
