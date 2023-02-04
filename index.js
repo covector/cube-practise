@@ -14,6 +14,11 @@ info.fov = fov;
 const dist = 1.75 / Math.tan(fov / 2 * Math.PI / 180);
 const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
 
+let scaleFactor = parseFloat(document.URL.match(/(?<=[\?\&]scale=)[0-9\.]+/));
+scaleFactor = isNaN(scaleFactor) && scaleFactor > 0 ? 1 : scaleFactor;
+camera.zoom = scaleFactor;
+camera.updateProjectionMatrix();
+
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -52,7 +57,7 @@ const randomDimension = (xzSync = false) => {
   cube.scale.x = randomIn(min, max, 2);
   cube.scale.y = randomIn(min, max, 2);
   cube.scale.z = xzSync ? cube.scale.x : randomIn(min, max, 2);
-  info.scale = { x: cube.scale.x, y: cube.scale.y, z: cube.scale.z };
+  info.scale = { x: cube.scale.x * scaleFactor, y: cube.scale.y * scaleFactor, z: cube.scale.z * scaleFactor };
 }
 randomRotation();
 if (objType != "cube") {
@@ -71,7 +76,7 @@ const resize = () => {
 }
 window.addEventListener('resize', resize);
 
-const set = (newFov, rotation, scale) => {
+const set = (newFov, rotation, scale = {x: 1, y: 1, z: 1}) => {
   camera.fov = newFov;
   const newDist = 1.75 / Math.tan(newFov / 2 * Math.PI / 180);
   camera.position.y = newDist;
