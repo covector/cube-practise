@@ -15,7 +15,7 @@ const dist = 1.75 / Math.tan(fov / 2 * Math.PI / 180);
 const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 let scaleFactor = parseFloat(document.URL.match(/(?<=[\?\&]scale=)[0-9\.]+/));
-scaleFactor = isNaN(scaleFactor) && scaleFactor > 0 ? 1 : scaleFactor;
+scaleFactor = isNaN(scaleFactor) || scaleFactor <= 0 ? 1 : scaleFactor;
 camera.zoom = scaleFactor;
 camera.updateProjectionMatrix();
 
