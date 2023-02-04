@@ -8,7 +8,8 @@ const randomIn = (min, max, dp = 0) => {
 
 const scene = new THREE.Scene();
 
-const fov = randomIn(40,110);
+const predefinedFov = parseInt(document.URL.match(/(?<=[\?\&]fov=)[0-9]+/));
+const fov = isNaN(predefinedFov) ? randomIn(40,110) : predefinedFov;
 info.fov = fov;
 const dist = 1.75 / Math.tan(fov / 2 * Math.PI / 180);
 const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -25,7 +26,16 @@ const updateTexture = (tex) => {
 const texLoader = new THREE.TextureLoader(manager);
 texLoader.load("./redwax.jpg", updateTexture);
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
+// cube, cuboid, cylinder, elliptic-cylinder
+let objType = document.URL.match(/(?<=[\?\&]type=)[a-z\-]+/);
+if (!objType) {
+  objType = "cuboid";
+}
+if (objType != "cube" && objType != "cuboid" && objType != "cylinder" && objType != "elliptic-cylinder") {
+  alert("Invalid object type! Supported types: (cube, cuboid, cylinder, elliptic-cylinder)");
+  objType = "cuboid";
+}
+let geometry = objType == "cube" || objType == "cuboid" ? new THREE.BoxGeometry(1, 1, 1) : new THREE.CylinderGeometry(0.5, 0.5, 1, 64, 1);
 const material = new THREE.MeshMatcapMaterial();
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
@@ -36,16 +46,18 @@ const randomRotation = () => {
   cube.rotation.z = randomIn(0, Math.PI, 2);
   info.rotation = { x: cube.rotation.x, y: cube.rotation.y, z: cube.rotation.z };
 }
-const randomDimension = () => {
+const randomDimension = (xzSync = false) => {
   const min = 0.2;
   const max = 1.2;
   cube.scale.x = randomIn(min, max, 2);
   cube.scale.y = randomIn(min, max, 2);
-  cube.scale.z = randomIn(min, max, 2);
+  cube.scale.z = xzSync ? cube.scale.x : randomIn(min, max, 2);
   info.scale = { x: cube.scale.x, y: cube.scale.y, z: cube.scale.z };
 }
 randomRotation();
-randomDimension();
+if (objType != "cube") {
+  randomDimension(objType == "cylinder");
+}
 console.log(info);
 
 camera.position.y = dist;
@@ -59,9 +71,9 @@ const resize = () => {
 }
 window.addEventListener('resize', resize);
 
-const set = (fov, rotation, scale) => {
-  camera.fov = fov;
-  const newDist = 1.75 / Math.tan(fov / 2 * Math.PI / 180);
+const set = (newFov, rotation, scale) => {
+  camera.fov = newFov;
+  const newDist = 1.75 / Math.tan(newFov / 2 * Math.PI / 180);
   camera.position.y = newDist;
   camera.updateProjectionMatrix();
   cube.rotation.x = rotation.x;
@@ -76,10 +88,13 @@ window.set = set;
 
 const reload = () => {
   randomRotation();
-  randomDimension();
-  const newFov = randomIn(40,110);
+  if (objType != "cube") {
+    randomDimension(objType == "cylinder");
+  }
+  const predefinedFov = parseInt(document.URL.match(/(?<=[\?\&]fov=)[0-9]+/));
+  const newFov = isNaN(predefinedFov) ? randomIn(40,110) : predefinedFov;
   camera.fov = newFov;
-  const newDist = 1.75 / Math.tan(fov / 2 * Math.PI / 180);
+  const newDist = 1.75 / Math.tan(newFov / 2 * Math.PI / 180);
   camera.position.y = newDist;
   camera.updateProjectionMatrix();
   renderer.render(scene, camera);
