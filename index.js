@@ -23,13 +23,23 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+const matMaterial = new THREE.MeshMatcapMaterial();
+const wirMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
 const manager = new THREE.LoadingManager();
 const updateTexture = (tex) => {
-  cube.material.matcap = tex;
+  matMaterial.matcap = tex;
   renderer.render(scene, camera);
 }
 const texLoader = new THREE.TextureLoader(manager);
 texLoader.load("./redwax.jpg", updateTexture);
+
+let wireframe = false;
+const toggleWireframe = () => {
+  wireframe = !wireframe;
+  cube.material = wireframe ? wirMaterial : matMaterial;
+  renderer.render(scene, camera);
+}
+window.toggleWireframe = toggleWireframe;
 
 // cube, cuboid, cylinder, elliptic-cylinder
 let objType = document.URL.match(/(?<=[\?\&]type=)[a-z\-]+/);
@@ -41,8 +51,7 @@ if (objType != "cube" && objType != "cuboid" && objType != "cylinder" && objType
   objType = "cube";
 }
 let geometry = objType == "cube" || objType == "cuboid" ? new THREE.BoxGeometry(1, 1, 1) : new THREE.CylinderGeometry(0.5, 0.5, 1, 64, 1);
-const material = new THREE.MeshMatcapMaterial();
-const cube = new THREE.Mesh(geometry, material);
+const cube = new THREE.Mesh(geometry, matMaterial);
 scene.add(cube);
 
 const randomRotation = () => {
@@ -107,3 +116,11 @@ const reload = () => {
   console.log(info);
 }
 window.reload = reload;
+
+document.addEventListener('keydown', (event) => {
+  if (event.key == "w") {
+    toggleWireframe();
+  } else if (event.key == "r") {
+    reload();
+  }
+}, false);
