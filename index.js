@@ -33,13 +33,30 @@ const updateTexture = (tex) => {
 const texLoader = new THREE.TextureLoader(manager);
 texLoader.load("./redwax.jpg", updateTexture);
 
-let wireframe = false;
+let wireframe = parseInt(document.URL.match(/(?<=[\?\&]w=)[0-9]+/));;
 const toggleWireframe = () => {
   wireframe = !wireframe;
   cube.material = wireframe ? wirMaterial : matMaterial;
   renderer.render(scene, camera);
 }
 window.toggleWireframe = toggleWireframe;
+
+window.addEventListener('touchstart', handleTouchStart, false);        
+window.addEventListener('touchmove', handleTouchMove, false);
+let xDown = null;
+function handleTouchStart(e) {
+    const firstTouch = (e.touches || e.originalEvent.touches)[0];
+    xDown = firstTouch.clientX;
+    if (e.touches.length == 2) {
+      toggleWireframe();
+    }
+};                                                                                                                  
+function handleTouchMove(e) {
+    if (xDown && Math.abs(xDown - e.touches[0].clientX) > 5) {
+      reload();
+    }
+    xDown = null;
+};
 
 // cube, cuboid, cylinder, elliptic-cylinder
 let objType = document.URL.match(/(?<=[\?\&]type=)[a-z\-]+/);

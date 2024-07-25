@@ -49,3 +49,13 @@ https://covector.github.io/cube-practise/?scale=0.5
 | Scale = 1  | Scale = 0.5 |
 | ------------- | ------------- |
 |![](docs-img/cube_3.webp)|![](docs-img/cube_scale.webp)|
+
+## Additional Controls
+
+### Wireframe Mode
+Press `W` on keyboard or touch with 2 fingers on touchscreen, to toggle wireframe mode.
+
+![](docs-img/cube_wireframe.webp)
+
+### Reload
+Press `R` on keyboard or swipe left or right on touchscreen, to get another random angle.
