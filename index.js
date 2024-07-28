@@ -45,17 +45,19 @@ window.addEventListener('touchstart', handleTouchStart, false);
 window.addEventListener('touchmove', handleTouchMove, false);
 let xDown = null;
 function handleTouchStart(e) {
+  if (e.touches.length == 1) {
     const firstTouch = (e.touches || e.originalEvent.touches)[0];
     xDown = firstTouch.clientX;
-    if (e.touches.length == 2) {
-      toggleWireframe();
-    }
+  }
+  if (e.touches.length == 2) {
+    toggleWireframe();
+  }
 };                                                                                                                  
 function handleTouchMove(e) {
-    if (xDown && Math.abs(xDown - e.touches[0].clientX) > 5) {
-      reload();
-    }
-    xDown = null;
+  if (e.touches.length == 1 && xDown && Math.abs(xDown - e.touches[0].clientX) > 5) {
+    reload();
+  }
+  xDown = null;
 };
 
 // cube, cuboid, cylinder, elliptic-cylinder
