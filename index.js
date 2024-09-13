@@ -24,7 +24,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const matMaterial = new THREE.MeshMatcapMaterial();
-const wirMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+const wirMaterial = new THREE.LineBasicMaterial( { color: 0xffffff } );
 const manager = new THREE.LoadingManager();
 const updateTexture = (tex) => {
   matMaterial.matcap = tex;
@@ -33,10 +33,12 @@ const updateTexture = (tex) => {
 const texLoader = new THREE.TextureLoader(manager);
 texLoader.load("./redwax.jpg", updateTexture);
 
-let wireframe = parseInt(document.URL.match(/(?<=[\?\&]w=)[0-9]+/));;
+let wireframe = false;
 const toggleWireframe = () => {
   wireframe = !wireframe;
-  cube.material = wireframe ? wirMaterial : matMaterial;
+  scene.remove(cube);
+  scene.remove(wireframeCube);
+  scene.add(wireframe ? wireframeCube : cube);
   renderer.render(scene, camera);
 }
 window.toggleWireframe = toggleWireframe;
@@ -69,14 +71,19 @@ if (objType != "cube" && objType != "cuboid" && objType != "cylinder" && objType
   alert("Invalid object type! Supported types: (cube, cuboid, cylinder, elliptic-cylinder)");
   objType = "cube";
 }
-let geometry = objType == "cube" || objType == "cuboid" ? new THREE.BoxGeometry(1, 1, 1) : new THREE.CylinderGeometry(0.5, 0.5, 1, 64, 1);
+const geometry = objType == "cube" || objType == "cuboid" ? new THREE.BoxGeometry(1, 1, 1) : new THREE.CylinderGeometry(0.5, 0.5, 1, 64, 1);
+const wirGeometry = new THREE.EdgesGeometry(geometry);
 const cube = new THREE.Mesh(geometry, matMaterial);
+const wireframeCube = new THREE.LineSegments( wirGeometry, wirMaterial );
 scene.add(cube);
 
 const randomRotation = () => {
   cube.rotation.x = randomIn(0, Math.PI, 2);
   cube.rotation.y = randomIn(0, Math.PI, 2);
   cube.rotation.z = randomIn(0, Math.PI, 2);
+  wireframeCube.rotation.x = cube.rotation.x;
+  wireframeCube.rotation.y = cube.rotation.y;
+  wireframeCube.rotation.z = cube.rotation.z;
   info.rotation = { x: cube.rotation.x, y: cube.rotation.y, z: cube.rotation.z };
 }
 const randomDimension = (xzSync = false) => {
@@ -85,6 +92,9 @@ const randomDimension = (xzSync = false) => {
   cube.scale.x = randomIn(min, max, 2);
   cube.scale.y = randomIn(min, max, 2);
   cube.scale.z = xzSync ? cube.scale.x : randomIn(min, max, 2);
+  wireframeCube.scale.x = cube.scale.x;
+  wireframeCube.scale.y = cube.scale.y;
+  wireframeCube.scale.z = cube.scale.z;
   info.scale = { x: cube.scale.x * scaleFactor, y: cube.scale.y * scaleFactor, z: cube.scale.z * scaleFactor };
 }
 randomRotation();
@@ -115,6 +125,12 @@ const set = (newFov, rotation, scale = {x: 1, y: 1, z: 1}) => {
   cube.scale.x = scale.x;
   cube.scale.y = scale.y;
   cube.scale.z = scale.z;
+  wireframeCube.rotation.x = rotation.x;
+  wireframeCube.rotation.y = rotation.y;
+  wireframeCube.rotation.z = rotation.z;
+  wireframeCube.scale.x = scale.x;
+  wireframeCube.scale.y = scale.y;
+  wireframeCube.scale.z = scale.z;
   renderer.render(scene, camera);
 }
 window.set = set;
